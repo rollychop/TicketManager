@@ -42,6 +42,8 @@ class HomeViewModel @Inject constructor(
     private val _state = MutableStateFlow(FilterSortState())
     val state: StateFlow<FilterSortState> = _state
 
+    var query by mutableStateOf("")
+        private set
 
     private val queryFlow = snapshotFlow { query }
         .debounce(300)
@@ -62,8 +64,7 @@ class HomeViewModel @Inject constructor(
             initialValue = UiState.Loading()
         )
 
-    var query by mutableStateOf("")
-        private set
+
 
     fun onQueryChanged(query: String) {
         this.query = query
