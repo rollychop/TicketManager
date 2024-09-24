@@ -3,6 +3,7 @@ package com.bnc.ticketmanager.ui.screen.home
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,7 +35,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DockedSearchBar
@@ -62,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +73,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bnc.ticketmanager.R
 import com.bnc.ticketmanager.common.Constant
 import com.bnc.ticketmanager.domain.model.SortOrder
 import com.bnc.ticketmanager.domain.model.TicketModel
@@ -327,14 +329,22 @@ private fun HomeScreenContent(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (tickets.isEmpty()) {
-                Text(
-                    text = "No tickets available",
+            if (tickets.isEmpty()) {
+                Column(
                     modifier = Modifier.align(Alignment.Center),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_state),
+                        contentDescription = "no tickets",
+                        modifier = Modifier
+                    )
+                    Text(
+                        text = "No tickets available",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
