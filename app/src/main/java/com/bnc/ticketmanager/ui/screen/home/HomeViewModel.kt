@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bnc.ticketmanager.common.UiState
 import com.bnc.ticketmanager.domain.model.SortOrder
 import com.bnc.ticketmanager.domain.model.TicketModel
 import com.bnc.ticketmanager.domain.model.TicketSortOption
@@ -25,8 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-data class HomeScreenState(
-    val isLoading: Boolean = false,
+data class FilterSortState(
     val sortOrder: SortOrder = SortOrder.Ascending,
     val sortOption: TicketSortOption = TicketSortOption.Priority,
     val filterOption: TicketSortOption? = null
@@ -39,22 +39,27 @@ class HomeViewModel @Inject constructor(
     private val repository: TicketManagerRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(HomeScreenState())
-    val state: StateFlow<HomeScreenState> = _state
+    private val _state = MutableStateFlow(FilterSortState())
+    val state: StateFlow<FilterSortState> = _state
 
 
     private val queryFlow = snapshotFlow { query }
         .debounce(300)
-    val tickets: StateFlow<List<TicketModel>> = combine(
+    val tickets: StateFlow<UiState<List<TicketModel>>> = combine(
         flow = state,
         flow2 = queryFlow
     ) { state, query -> state to query }
         .flatMapLatest { (state, query) ->
-            repository.getAllTickets(state.sortOption, state.sortOrder, state.filterOption, query)
+            repository.getAllTickets(
+                state.sortOption,
+                state.sortOrder,
+                state.filterOption,
+                query
+            )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = UiState.Loading()
         )
 
     var query by mutableStateOf("")

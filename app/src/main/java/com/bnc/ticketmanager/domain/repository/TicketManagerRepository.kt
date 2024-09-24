@@ -1,5 +1,6 @@
 package com.bnc.ticketmanager.domain.repository
 
+import com.bnc.ticketmanager.common.UiState
 import com.bnc.ticketmanager.domain.model.TicketModel
 import com.bnc.ticketmanager.domain.model.TicketSortOption
 import com.bnc.ticketmanager.domain.model.SortOrder
@@ -18,7 +19,7 @@ interface TicketManagerRepository {
         sortOrder: SortOrder,
         filterOption: TicketSortOption?,
         query: String
-    ): Flow<List<TicketModel>>
+    ): Flow<UiState<List<TicketModel>>>
 
     fun getTicketById(ticketId: Int): Flow<TicketModel?>
 

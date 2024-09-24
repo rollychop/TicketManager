@@ -1,5 +1,6 @@
 package com.bnc.ticketmanager.data.repository
 
+import com.bnc.ticketmanager.common.UiState
 import com.bnc.ticketmanager.data.data_source.local.dao.TicketManagerDao
 import com.bnc.ticketmanager.data.mapper.TicketMapper
 import com.bnc.ticketmanager.domain.model.SortOrder
@@ -33,10 +34,10 @@ class TicketManagerRepositoryImpl @Inject constructor(
         sortOrder: SortOrder,
         filterOption: TicketSortOption?,
         query: String
-    ): Flow<List<TicketModel>> {
+    ): Flow<UiState<List<TicketModel>>> {
         return ticketDao.getTickets(query, sortOption, filterOption, sortOrder).map { entities ->
             entities.map(TicketMapper::fromEntity)
-        }
+        }.map { UiState.Success(it) }
     }
 
     override fun getTicketById(ticketId: Int): Flow<TicketModel?> {

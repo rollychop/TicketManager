@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DockedSearchBar
@@ -73,6 +74,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bnc.ticketmanager.R
 import com.bnc.ticketmanager.common.Constant
+import com.bnc.ticketmanager.common.UiState
 import com.bnc.ticketmanager.domain.model.SortOrder
 import com.bnc.ticketmanager.domain.model.TicketModel
 import com.bnc.ticketmanager.domain.model.TicketSortOption
@@ -88,11 +90,11 @@ fun HomeScreen(
     navigator: Navigator,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val tickets by viewModel.tickets.collectAsStateWithLifecycle()
+    val uiState by viewModel.tickets.collectAsStateWithLifecycle()
 
     HomeScreenContent(
         state = viewModel.state.collectAsStateWithLifecycle().value,
-        tickets = tickets,
+        uiState = uiState,
         onAddTicketClick = {
             navigator.navigate(Screen.AddTicketScreen())
         },
@@ -114,8 +116,8 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun HomeScreenContent(
-    state: HomeScreenState,
-    tickets: List<TicketModel>,
+    state: FilterSortState,
+    uiState: UiState<List<TicketModel>>,
     query: String,
     onQueryChange: (String) -> Unit,
     onAddTicketClick: () -> Unit,
@@ -327,53 +329,60 @@ private fun HomeScreenContent(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (tickets.isEmpty()) {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.empty_state),
-                        contentDescription = "no tickets",
-                        modifier = Modifier
-                    )
-                    Text(
-                        text = "No tickets available",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            } else {
-                LazyVerticalGrid(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = 16.dp,
-                        bottom = 96.dp
-                    ),
-                    columns = GridCells.Adaptive(minSize = 300.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    item(
-                        span = { GridItemSpan(maxLineSpan) }
+            if (uiState is UiState.Loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            if (uiState is UiState.Success) {
+                if (uiState.data.isEmpty()) {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.empty_state),
+                            contentDescription = "no tickets",
+                            modifier = Modifier
+                        )
                         Text(
-                            text = "Tickets",
-                            style = MaterialTheme.typography.titleSmall
+                            text = "No tickets available",
+                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
-                    items(
-                        items = tickets,
-                        key = { it.id }
-                    ) { ticket ->
-                        TicketItem(
-                            modifier = Modifier.animateItem(),
-                            ticket = ticket,
-                            onClick = { onTicketClick(ticket) },
-                            onDeleteClick = { onDeleteTicketClick(ticket) }
-                        )
+                } else {
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 96.dp
+                        ),
+                        columns = GridCells.Adaptive(minSize = 300.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        item(
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            Text(
+                                text = "Tickets",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                        }
+                        items(
+                            items = uiState.data,
+                            key = { it.id }
+                        ) { ticket ->
+                            TicketItem(
+                                modifier = Modifier.animateItem(),
+                                ticket = ticket,
+                                onClick = { onTicketClick(ticket) },
+                                onDeleteClick = { onDeleteTicketClick(ticket) }
+                            )
+                        }
                     }
                 }
             }
