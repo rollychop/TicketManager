@@ -50,7 +50,6 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,7 +59,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -127,7 +125,6 @@ private fun HomeScreenContent(
     onSortOrdersChange: (SortOrder) -> Unit,
     onChangeFilterColumn: (TicketSortOption?) -> Unit,
 ) {
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var showSortDialog by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -139,7 +136,7 @@ private fun HomeScreenContent(
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier,
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTicketClick) {
                 Icon(
@@ -201,13 +198,14 @@ private fun HomeScreenContent(
                         },
                         placeholder = {
                             Text("Search tickets ...")
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 },
                 expanded = expanded,
                 onExpandedChange = {
                     expanded = it
-                }
+                },
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 16.dp)
@@ -348,7 +346,12 @@ private fun HomeScreenContent(
             } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 16.dp,
+                        bottom = 96.dp
+                    ),
                     columns = GridCells.Adaptive(minSize = 300.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)

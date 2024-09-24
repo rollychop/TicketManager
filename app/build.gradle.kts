@@ -82,6 +82,9 @@ dependencies {
     //lifecycle-viewmodel-compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    //material MDC
+    implementation(libs.material.mdc)
+
     //room db
     implementation(libs.room)
     implementation(libs.room.ktx)
